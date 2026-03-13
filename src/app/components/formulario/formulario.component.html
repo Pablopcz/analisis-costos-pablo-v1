@@ -3,9 +3,7 @@
   <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
       <h6 class="mb-0">📊 Mi Nuevo Sistema de Costos</h6>
-      <button type="button"
-        class="btn btn-danger btn-sm fw-bold shadow-sm"
-        (click)="salir()">
+      <button type="button" class="btn btn-danger btn-sm fw-bold shadow-sm" (click)="salir()">
         ❌ SALIR
       </button>
     </div>
@@ -57,30 +55,34 @@
       <table class="table table-sm table-hover align-middle mb-0 text-center">
         <thead class="table-dark">
           <tr>
-            <th style="width: 30%">Proyecto</th>
+            <th style="width: 25%">Proyecto</th>
             <th style="width: 20%">Costo Real</th>
             <th style="width: 20%">Variación</th>
             <th style="width: 20%">Estado</th>
-            <th style="width: 10%">Acción</th>
+            <th style="width: 15%">Acción</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let p of (proyectos$ | async)">
-            <td class="fw-bold">{{p.nombre}}</td>
+            <td class="fw-bold">{{ p.nombre }}</td>
             <td>${{ (p.horasReales * p.costoHora) | number }}</td>
             
-           <td *ngIf="calcularVariacion(p) as v"
-    class="fw-bold"
-    [ngClass]="{
-      'text-danger': v > 0,
-      'text-success': v < 0,
-      'text-primary': v === 0
-    }">
-  {{ v | number }}
-</td>
+            <td class="fw-bold" [ngClass]="obtenerEstado(p).clase">
+              {{ calcularVariacion(p) | number }}
+            </td>
 
             <td>
-              <button (click)="eliminar(p.id!)" class="btn btn-danger btn-sm rounded-circle shadow-sm">🗑️</button>
+              <span [title]="obtenerEstado(p).texto">
+                {{ obtenerEstado(p).emoji }}
+              </span>
+            </td>
+
+            <td>
+              <button (click)="eliminar(p.id!)" 
+                      class="btn btn-outline-danger btn-sm border-0" 
+                      title="Eliminar proyecto">
+                🗑️
+              </button>
             </td>
           </tr>
         </tbody>

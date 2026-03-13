@@ -17,20 +17,23 @@ declare var google: any;
 export class FormularioComponent implements OnInit {
 
   private proyectosService = inject(ProyectosService);
-
   constructor(private router: Router) {}
+
+  // Datos del formulario
+  proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
+  proyectos$!: Observable<any[]>;
 
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     $event.returnValue = true;
   }
 
-  proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
-  proyectos$!: Observable<any[]>;
-
   ngOnInit() {
     this.proyectos$ = this.proyectosService.getProyectos();
+    
+    // Cargar Google Charts
     google.charts.load('current', { 'packages': ['corechart'] });
+    
     this.proyectos$.subscribe(datos => {
       if (datos && datos.length > 0) {
         google.charts.setOnLoadCallback(() => this.dibujarGraficas(datos));
@@ -38,7 +41,7 @@ export class FormularioComponent implements OnInit {
     });
   }
 
-  // --- LÓGICA DE CÁLCULOS PARA LA TABLA ---
+  // --- LÓGICA DE CÁLCULOS ---
   
   calcularVariacion(p: any): number {
     return (p.horasReales - p.horasEstimadas) * p.costoHora;
@@ -46,16 +49,17 @@ export class FormularioComponent implements OnInit {
 
   obtenerEstado(p: any) {
     const v = this.calcularVariacion(p);
-    if (v > 0) return { texto: 'Sobrecosto', clase: 'bg-danger', emoji: '🚩' };
-    if (v < 0) return { texto: 'Ahorro', clase: 'bg-success', emoji: '💰' };
-    return { texto: 'A punto', clase: 'bg-primary', emoji: '✅' };
+    if (v > 0) return { texto: 'Sobrecosto', clase: 'text-danger', emoji: '🔴' };
+    if (v < 0) return { texto: 'Ahorro', clase: 'text-success', emoji: '🟢' };
+    return { texto: 'A punto', clase: 'text-primary', emoji: '🔵' };
   }
 
-  // --- MÉTODOS DE ACCIÓN ---
+  // --- ACCIONES ---
 
   guardar() {
-    if (this.proyecto.nombre) {
+    if (this.proyecto.nombre && this.proyecto.costoHora > 0) {
       this.proyectosService.guardarProyecto(this.proyecto);
+      // Limpiar formulario
       this.proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
     }
   }
@@ -66,26 +70,37 @@ export class FormularioComponent implements OnInit {
     }
   }
 
+  salir() {
+    if (confirm("¿Seguro que quieres cerrar sesión?")) {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  // --- GRÁFICAS ---
+
   dibujarGraficas(datos: any[]) {
+    // Gráfica de Barras
     const dataBarras = new google.visualization.DataTable();
     dataBarras.addColumn('string', 'Proyecto');
     dataBarras.addColumn('number', 'Estimado');
     dataBarras.addColumn('number', 'Real');
 
     datos.forEach(p => {
-      dataBarras.addRow([p.nombre || 'S/N', (p.horasEstimadas * p.costoHora), (p.horasReales * p.costoHora)]);
+      dataBarras.addRow([
+        p.nombre || 'S/N', 
+        (p.horasEstimadas * p.costoHora), 
+        (p.horasReales * p.costoHora)
+      ]);
     });
 
-    const optionsBarras = {
+    const chartBarras = new google.visualization.ColumnChart(document.getElementById('grafica_barras'));
+    chartBarras.draw(dataBarras, {
       title: 'Estimado vs Real ($)',
       colors: ['#4285f4', '#db4437'],
-      chartArea: { width: '70%' },
-      legend: { position: 'top' }
-    };
+      chartArea: { width: '70%' }
+    });
 
-    const chartBarras = new google.visualization.ColumnChart(document.getElementById('grafica_barras'));
-    chartBarras.draw(dataBarras, optionsBarras);
-
+    // Gráfica de Evolución
     const dataLinea = new google.visualization.DataTable();
     dataLinea.addColumn('string', 'Proyecto');
     dataLinea.addColumn('number', 'Costo Real');
@@ -94,20 +109,11 @@ export class FormularioComponent implements OnInit {
       dataLinea.addRow([p.nombre || 'S/N', (p.horasReales * p.costoHora)]);
     });
 
-    const optionsLinea = {
+    const chartLinea = new google.visualization.LineChart(document.getElementById('grafica_evolucion'));
+    chartLinea.draw(dataLinea, {
       title: 'Evolución de Costos',
       curveType: 'function',
-      legend: { position: 'bottom' },
       colors: ['#4285f4']
-    };
-
-    const chartLinea = new google.visualization.LineChart(document.getElementById('grafica_evolucion'));
-    chartLinea.draw(dataLinea, optionsLinea);
-  }
-
-  salir() {
-    if (confirm("¿Seguro que quieres cerrar sesión y volver al inicio?")) {
-      this.router.navigate(['/login']);
-    }
+    });
   }
 }

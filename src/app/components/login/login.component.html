@@ -6,14 +6,14 @@
       <p class="text-muted small">Bienvenido, Pablo Cesar Zuniga</p>
     </div>
 
-    <form>
+    <form (submit)="$event.preventDefault()">
       <div class="mb-3 text-start">
         <label class="form-label small fw-bold">Usuario</label>
         <input type="text" 
                name="usuario"
                [(ngModel)]="credenciales.usuario" 
                class="form-control" 
-               placeholder="Ingresa tu usuario">
+               placeholder="ejemplo@correo.com">
       </div>
 
       <div class="mb-4 text-start">
@@ -27,11 +27,27 @@
 
       <button type="button" 
               (click)="entrar()" 
-              class="btn btn-primary w-100 fw-bold py-2 shadow-sm" 
+              class="btn btn-primary w-100 fw-bold py-2 shadow-sm mb-3" 
               style="border-radius: 10px;">
         ENTRAR AL DASHBOARD
       </button>
-    </form>
 
+      <div class="d-flex align-items-center my-3">
+        <hr class="flex-grow-1">
+        <span class="mx-2 text-muted small">o</span>
+        <hr class="flex-grow-1">
+      </div>
+
+      <button type="button" 
+              (click)="loginConGoogle()" 
+              class="btn w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center" 
+              style="border-radius: 10px; background-color: #db4437; color: white; border: none;">
+        <div class="bg-white d-flex align-items-center justify-content-center me-2" 
+             style="border-radius: 4px; width: 24px; height: 24px;">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16">
+        </div>
+        ENTRAR CON GOOGLE
+      </button>
+    </form>
   </div>
 </div>

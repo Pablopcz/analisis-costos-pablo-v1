@@ -1,34 +1,51 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // <-- IMPORTANTE: Necesario para los inputs
+import { FormsModule } from '@angular/forms';
+import { Auth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule], // <-- AGREGADO: Para que funcione el [(ngModel)]
+  imports: [FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  private auth = inject(Auth);
+  private router = inject(Router);
 
-  // 1. Definimos los datos que el usuario va a escribir
+  // Estas variables permiten que lo que escribas en los inputs se guarde aquí
   credenciales = {
-    usuario: '',
+    usuario: '', 
     password: ''
   };
 
-  constructor(private router: Router) {}
-
-  // 2. La función que revisa si los datos son correctos
- entrar() {
-    // Actualizamos con tu cédula y la misma clave
-    if (this.credenciales.usuario === '16285516' && this.credenciales.password === '1234') {
+  // FUNCIÓN PARA EL BOTÓN AZUL (Manual)
+  async entrar() {
+    try {
+      // Intentamos entrar con el correo y clave que escribiste
+      // Nota: El 'usuario' debe ser un correo en Firebase (ej: cesarzuniga@gmail.com)
+      await signInWithEmailAndPassword(this.auth, this.credenciales.usuario, this.credenciales.password);
       
-      console.log('✅ Acceso concedido para Pablo');
+      console.log('✅ Entraste con éxito');
       this.router.navigate(['/dashboard']);
+    } catch (error: any) {
+      console.error(error);
+      alert('❌ Error: Usuario o contraseña no válidos en Firebase');
+    }
+  }
 
-    } else {
-      alert('❌ Error: Cédula o contraseña incorrectos');
+  // FUNCIÓN PARA EL BOTÓN ROJO (Google)
+  async loginConGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.auth, provider);
+      
+      console.log('✅ Entraste con Google');
+      this.router.navigate(['/dashboard']);
+    } catch (error: any) {
+      console.error(error);
+      alert('❌ Error al conectar con Google');
     }
   }
 }
