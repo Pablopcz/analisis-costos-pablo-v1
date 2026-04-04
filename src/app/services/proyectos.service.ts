@@ -1,24 +1,28 @@
-import { Injectable, inject } from '@angular/core';
-import { Database, ref, push, listVal, remove } from '@angular/fire/database';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProyectosService {
-  private db = inject(Database);
+  // URL de tu servidor Node.js
+  private apiUrl = 'http://localhost:3000/proyectos';
 
-  getProyectos() {
-    const proyectosRef = ref(this.db, 'proyectos');
-    return listVal(proyectosRef, { keyField: 'id' });
+  constructor(private http: HttpClient) { }
+
+  // Traer datos filtrados por el correo del usuario logueado
+  getProyectos(correo: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${correo}`);
   }
 
-  guardarProyecto(datos: any) {
-    const proyectoRef = ref(this.db, 'proyectos');
-    return push(proyectoRef, datos);
+  // Guardar nuevo proyecto en MySQL
+  guardarProyecto(proyecto: any): Observable<any> {
+    return this.http.post(this.apiUrl, proyecto);
   }
 
-  eliminarProyecto(id: string) {
-    const proyectoRef = ref(this.db, `proyectos/${id}`);
-    return remove(proyectoRef);
+  // Eliminar proyecto por su ID
+  eliminarProyecto(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

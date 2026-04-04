@@ -1,0 +1,69 @@
+{
+  "proyectos": [
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "vZdCCz1G7_M"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 10000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "9pS7c2x_d2U"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 2,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "OU_3UwnuCtE"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "Qdhj3VO5l2c"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 2,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "Ms4KQH8jJxY"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "R-5zp90wtXA"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "eLWqSypjDn0"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 5,
+      "horasReales": 8,
+      "costoHora": 2000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "r-pyXqdrf2E"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
