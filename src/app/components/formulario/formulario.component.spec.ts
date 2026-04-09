@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProyectosService } from '../../services/proyectos.service';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 declare var google: any;
@@ -15,54 +16,69 @@ declare var google: any;
 })
 export class FormularioComponent implements OnInit {
   private proyectosService = inject(ProyectosService);
-  proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
-  proyectos$!: Observable<any[]>;
+  private router = inject(Router);
+
+  // ESTO FALTABA Y POR ESO EL HTML ESTABA ROJO
+  public usuarioLogueado = {
+    displayName: 'Pablo Cesar Zuñiga',
+    email: 'pcz7910@gmail.com'
+  };
+
+  public proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
+  public proyectos: any[] = []; // Usamos un array normal para facilitar las gráficas
 
   ngOnInit() {
-    this.proyectos$ = this.proyectosService.getProyectos();
-    google.charts.load('current', {'packages':['corechart']});
-    this.proyectos$.subscribe(datos => {
-      if (datos && datos.length > 0) {
-        google.charts.setOnLoadCallback(() => this.dibujarGraficas(datos));
+    this.cargarDatos();
+    if (typeof google !== 'undefined') {
+      google.charts.load('current', { 'packages': ['corechart'] });
+    }
+  }
+
+  cargarDatos() {
+    this.proyectosService.getProyectos(this.usuarioLogueado.email).subscribe(datos => {
+      this.proyectos = datos;
+      if (this.proyectos.length > 0) {
+        setTimeout(() => this.dibujarGraficas(), 500);
       }
     });
   }
 
-  async guardar() {
-    const costoEstimado = this.proyecto.horasEstimadas * this.proyecto.costoHora;
-    const costoReal = this.proyecto.horasReales * this.proyecto.costoHora;
-    const variacion = costoReal - costoEstimado;
-    const estado = variacion > 0 ? '🚩 Sobrecosto' : '✅ Ahorro';
+  dibujarGraficas() {
+    if (typeof google === 'undefined' || !google.visualization) return;
 
-    const datosFinales = {
-      nombreProyecto: this.proyecto.nombre,
-      horasEstimadas: this.proyecto.horasEstimadas,
-      horasReales: this.proyecto.horasReales,
-      costoHora: this.proyecto.costoHora,
-      costoEstimado, costoReal, variacion, estado,
-      fecha: new Date().toISOString()
-    };
+    const dataBarras = new google.visualization.DataTable();
+    dataBarras.addColumn('string', 'Proyecto');
+    dataBarras.addColumn('number', 'Estimadas');
+    dataBarras.addColumn('number', 'Reales');
 
-    await this.proyectosService.guardarProyecto(datosFinales);
-    this.proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
-  }
-
-  async eliminar(id: string) {
-    if (confirm('¿Deseas eliminar este registro?')) {
-      await this.proyectosService.eliminarProyecto(id);
-    }
-  }
-
-  dibujarGraficas(datos: any[]) {
-    const dataBarras = [['Proyecto', 'Estimado', 'Real']];
-    const dataLineas = [['Proyecto', 'Costo Real']];
-    datos.forEach(p => {
-      dataBarras.push([p.nombreProyecto, p.costoEstimado, p.costoReal]);
-      dataLineas.push([p.nombreProyecto, p.costoReal]);
+    this.proyectos.forEach(p => {
+      dataBarras.addRow([p.nombre, p.horasEstimadas, p.horasReales]);
     });
-    const chartB = new google.visualization.ColumnChart(document.getElementById('grafica_barras'));
-    chartB.draw(google.visualization.arrayToDataTable(dataBarras), { title: 'Estimado vs Real ($)' });
-    const chartL = new google.visualization.LineChart(document.getElementById('grafica_lineas'));
-    chartL.draw(google.visualization.arrayToDataTable(dataLineas), { title: 'Evolución de Costos', curveType: 'function' });
+
+    const chart1 = new google.visualization.ColumnChart(document.getElementById('grafica1'));
+    chart1.draw(dataBarras, { title: 'Comparativa de Horas', height: 250 });
+
+    const dataPie = new google.visualization.DataTable();
+    dataPie.addColumn('string', 'Proyecto');
+    dataPie.addColumn('number', 'Costo');
+
+    this.proyectos.forEach(p => {
+      dataPie.addRow([p.nombre, (p.horasReales * p.costoHora)]);
+    });
+
+    const chart2 = new google.visualization.PieChart(document.getElementById('grafica2'));
+    chart2.draw(dataPie, { title: 'Distribución de Costos', height: 250 });
+  }
+
+  async guardar() {
+    const payload = { ...this.proyecto, usuario_correo: this.usuarioLogueado.email };
+    this.proyectosService.guardarProyecto(payload).subscribe(() => {
+      this.proyecto = { nombre: '', horasEstimadas: 0, horasReales: 0, costoHora: 0 };
+      this.cargarDatos();
+    });
+  }
+
+  salir() {
+    this.router.navigate(['/login']);
   }
 }

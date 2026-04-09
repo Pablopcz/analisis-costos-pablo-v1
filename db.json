@@ -63,6 +63,86 @@
       "costoHora": 2000,
       "usuario_correo": "pcz7910@gmail.com",
       "id": "r-pyXqdrf2E"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "uQWi_C2g2mI"
+    },
+    {
+      "nombre": "",
+      "horasEstimadas": 0,
+      "horasReales": 0,
+      "costoHora": 0,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "F5NhZWCRsJA"
+    },
+    {
+      "nombre": "",
+      "horasEstimadas": 0,
+      "horasReales": 0,
+      "costoHora": 0,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "heb_zq4fkEs"
+    },
+    {
+      "nombre": "",
+      "horasEstimadas": 0,
+      "horasReales": 0,
+      "costoHora": 0,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "4AJ-uwgzWOg"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 1,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "ITh18TOANNI"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 5,
+      "horasReales": 8,
+      "costoHora": 10000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "F98GG2eg8tU"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 2,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz791@gmail.com",
+      "id": "dGl5utyKQL8"
+    },
+    {
+      "nombre": "Pablo",
+      "horasEstimadas": 2,
+      "horasReales": 8,
+      "costoHora": 1000,
+      "usuario_correo": "pcz791@gmail.com",
+      "id": "cJINJYpq3o0"
+    },
+    {
+      "nombre": "DAVID",
+      "horasEstimadas": 2,
+      "horasReales": 8,
+      "costoHora": 5000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "96JDksHZ6EA"
+    },
+    {
+      "nombre": "pablo",
+      "horasEstimadas": 3,
+      "horasReales": 4,
+      "costoHora": 2000,
+      "usuario_correo": "pcz7910@gmail.com",
+      "id": "x3isCbHo8SM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
