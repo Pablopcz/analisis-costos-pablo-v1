@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProyectosService, Proyecto } from '../../services/proyectos.service';
 import { Router } from '@angular/router';
+import { ApiExternaService } 
+from '../../services/api-externa.service';
+
+import { ProyectosAnalisisCostosMockService } 
+from '../../services/proyectos-analisis-costos-mock.service';
 
 // Declaramos google para evitar error de TypeScript
 declare var google: any;
@@ -18,14 +23,80 @@ export class FormularioComponent implements OnInit {
 
   private proyectosService = inject(ProyectosService);
   private router = inject(Router);
+  private apiExterna = inject(ApiExternaService);
 
-  // ✅ Usuario
+  private mockService = inject(ProyectosAnalisisCostosMockService);
+
+  mostrarFormularioMock = false;
+
+  proyectoMock = {
+    nombreProyecto: '',
+    presupuestoInicial: 0,
+    costoReal: 0,
+    variacion: 0,
+    desviacion: 0,
+    estado: '',
+    categoria: '',
+    responsable: '',
+    costoPorDia: 0
+  };
+
+  proyectosMock: any[] = [];
+
+  toggleFormularioMock() {
+    this.mostrarFormularioMock = !this.mostrarFormularioMock;
+  }
+
+  guardarProyectoMock() {
+    if (this.proyectoMock.costoReal > this.proyectoMock.presupuestoInicial) {
+      this.proyectoMock.estado = 'Crítico';
+    } else {
+      this.proyectoMock.estado = 'Normal';
+    }
+
+    this.mockService.crear(this.proyectoMock).subscribe(() => {
+      this.cargarProyectosMock();
+
+      this.proyectoMock = {
+        nombreProyecto: '',
+        presupuestoInicial: 0,
+        costoReal: 0,
+        variacion: 0,
+        desviacion: 0,
+        estado: '',
+        categoria: '',
+        responsable: '',
+        costoPorDia: 0
+      };
+    });
+  }
+
+  cargarProyectosMock() {
+    this.mockService.obtener().subscribe(data => {
+      this.proyectosMock = data;
+    });
+  }
+
+  eliminarProyectoMock(id: string) {
+    if (confirm('¿Deseas eliminar este proyecto de la API Mock?')) {
+      this.mockService.eliminar(id).subscribe(() => {
+        this.cargarProyectosMock();
+      });
+    }
+  }
+
+  abrirApiMock() {
+    window.open(
+      'https://69c5c91ff272266f3eab8814.mockapi.io/proyectos-analisis-costos',
+      '_blank'
+    );
+  }
+
   public usuarioLogueado = {
     displayName: 'Pablo Cesar Zúñiga',
     email: 'pcz7910@gmail.com'
   };
 
-  // ✅ Último registro
   public ultimoRegistro: string = 'N/A';
 
   public proyectos: Proyecto[] = [];
@@ -41,47 +112,42 @@ export class FormularioComponent implements OnInit {
   ngOnInit(): void {
     this.initCharts();
     this.cargarDatos();
+
+    this.apiExterna.obtenerUsuarios().subscribe();
+
+    this.cargarProyectosMock();
   }
 
-  // ✅ Inicializa Google Charts
   initCharts(): void {
     if (typeof google !== 'undefined') {
       google.charts.load('current', { packages: ['corechart'] });
     }
   }
 
-  // ✅ MÉTODO CLAVE: carga datos + redibuja TODO
   cargarDatos(): void {
-    this.proyectosService
-      .getProyectos(this.usuarioLogueado.email)
+    this.proyectosService.obtenerProyectos()
       .subscribe(datos => {
 
-        // ✅ Actualizar lista
         this.proyectos = datos;
 
-        // ✅ Calcular último registro
         if (this.proyectos.length > 0) {
           const ultimo = this.proyectos.reduce((a, b) =>
-            new Date(a.created_at!) > new Date(b.created_at!) ? a : b
+            new Date(a.createdAt!) > new Date(b.createdAt!) ? a : b
           );
-          this.ultimoRegistro = ultimo.created_at!;
+          this.ultimoRegistro = ultimo.createdAt!;
         } else {
           this.ultimoRegistro = 'N/A';
         }
 
-        // 🔥 CLAVE ABSOLUTA → FORZAR REDIBUJO DE GRÁFICAS
         setTimeout(() => {
           this.dibujarGraficas();
         }, 0);
-
       });
   }
 
-  // ✅ Dibujar gráficas con datos reales
   dibujarGraficas(): void {
     if (typeof google === 'undefined' || !google.visualization) return;
 
-    /* -------- GRÁFICA 1: COLUMNAS -------- */
     const dataBarras = new google.visualization.DataTable();
     dataBarras.addColumn('string', 'Proyecto');
     dataBarras.addColumn('number', 'Estimadas');
@@ -91,16 +157,13 @@ export class FormularioComponent implements OnInit {
       dataBarras.addRow([p.nombre, p.horasEstimadas, p.horasReales]);
     });
 
-    const grafica1 = document.getElementById('grafica1');
-    if (grafica1) {
-      const chart = new google.visualization.ColumnChart(grafica1);
-      chart.draw(dataBarras, {
-        title: 'Horas Estimadas vs Reales',
-        height: 250
-      });
-    }
+    new google.visualization.ColumnChart(
+      document.getElementById('grafica1')
+    ).draw(dataBarras, {
+      title: 'Horas Estimadas vs Reales',
+      height: 250
+    });
 
-    /* -------- GRÁFICA 2: PASTEL -------- */
     const dataPie = new google.visualization.DataTable();
     dataPie.addColumn('string', 'Proyecto');
     dataPie.addColumn('number', 'Costo Total');
@@ -109,26 +172,21 @@ export class FormularioComponent implements OnInit {
       dataPie.addRow([p.nombre, p.horasReales * p.costoHora]);
     });
 
-    const grafica2 = document.getElementById('grafica2');
-    if (grafica2) {
-      const chart = new google.visualization.PieChart(grafica2);
-      chart.draw(dataPie, {
-        title: 'Distribución de Costos',
-        height: 250
-      });
-    }
+    new google.visualization.PieChart(
+      document.getElementById('grafica2')
+    ).draw(dataPie, {
+      title: 'Distribución de Costos',
+      height: 250
+    });
   }
 
-  // ✅ Guardar proyecto SIN refrescar página
   guardar(): void {
     const payload: Proyecto = {
       ...this.proyecto,
       usuario_correo: this.usuarioLogueado.email
     };
 
-    this.proyectosService.guardarProyecto(payload).subscribe(() => {
-
-      // ✅ Limpiar formulario
+    this.proyectosService.crearProyecto(payload).subscribe(() => {
       this.proyecto = {
         nombre: '',
         horasEstimadas: 0,
@@ -136,25 +194,21 @@ export class FormularioComponent implements OnInit {
         costoHora: 0,
         usuario_correo: ''
       };
-
-      // 🔥 Forzar recarga visual completa
       this.cargarDatos();
-
     });
   }
 
-  // ✅ Eliminar proyecto (también actualiza todo)
-  eliminar(id: number): void {
+  // ✅ ✅ ✅ ESTE ERA EL ÚNICO ERROR REAL
+  eliminar(id?: string): void {
+    if (!id) return;
+
     if (confirm('¿Deseas eliminar este registro?')) {
-      this.proyectosService
-        .eliminarProyecto(id)
-        .subscribe(() => {
-          this.cargarDatos();
-        });
+      this.proyectosService.eliminarProyecto(id).subscribe(() => {
+        this.cargarDatos();
+      });
     }
   }
 
-  // ✅ Salir
   salir(): void {
     this.router.navigate(['/login']);
   }

@@ -1,126 +1,64 @@
-<div class="container-fluid p-4" style="background-color: #1a2a40; min-height: 100vh;">
+<div class="container p-4">
 
   <!-- CABECERA -->
-  <div class="card mb-4 bg-light shadow-sm">
-    <div class="card-body d-flex justify-content-between align-items-center py-2">
+  <div class="card mb-3">
+    <div class="card-body d-flex justify-content-between">
 
-      <div class="small">
-        <i class="bi bi-person-fill"></i>
-        Sesión de:
+      <div>
         <strong>{{ usuarioLogueado?.displayName }}</strong><br>
-
-        <i class="bi bi-envelope"></i>
-        Correo:
-        <strong>{{ usuarioLogueado?.email }}</strong><br>
-
-        <i class="bi bi-calendar"></i>
-        Último registro:
-        <strong>{{ ultimoRegistro }}</strong>
+        {{ usuarioLogueado?.email }}<br>
+        Último: {{ ultimoRegistro }}
       </div>
 
-      <div class="text-end">
-        <span class="badge bg-primary mb-2">
-          Registros en MySQL: {{ proyectos.length }}
-        </span><br>
-        <button class="btn btn-outline-danger btn-sm" (click)="salir()">
-          ❌ SALIR
-        </button>
-      </div>
+      <button class="btn btn-danger" (click)="salir()">
+        SALIR
+      </button>
 
     </div>
   </div>
 
-  <!-- CONTENIDO -->
   <div class="row">
 
     <!-- FORMULARIO -->
     <div class="col-md-5">
-      <div class="card shadow border-0">
-
-        <div class="card-header bg-primary text-white py-2">
-          <h6 class="mb-0">📊 Registro de Proyectos en MySQL</h6>
-        </div>
-
+      <div class="card">
         <div class="card-body">
-          <label class="small fw-bold">🚀 Nombre del Proyecto</label>
-          <input
-            type="text"
-            [(ngModel)]="proyecto.nombre"
-            name="nombre"
-            class="form-control mb-3"
-            placeholder="Ej: App Móvil"
-          >
 
-          <div class="row text-center">
-            <div class="col-4">
-              <label class="small">
-                <i class="bi bi-clock"></i> H. Est
-              </label>
-              <input
-                type="number"
-                [(ngModel)]="proyecto.horasEstimadas"
-                name="hEst"
-                class="form-control"
-              >
-            </div>
+          <input class="form-control mb-2"
+                 placeholder="Nombre"
+                 [(ngModel)]="proyecto.nombre">
 
-            <div class="col-4">
-              <label class="small">
-                <i class="bi bi-clock-history"></i> H. Real
-              </label>
-              <input
-                type="number"
-                [(ngModel)]="proyecto.horasReales"
-                name="hReal"
-                class="form-control"
-              >
-            </div>
+          <input class="form-control mb-2"
+                 type="number"
+                 placeholder="Horas Estimadas"
+                 [(ngModel)]="proyecto.horasEstimadas">
 
-            <div class="col-4">
-              <label class="small">
-                <i class="bi bi-cash"></i> $/Hora
-              </label>
-              <input
-                type="number"
-                [(ngModel)]="proyecto.costoHora"
-                name="cHora"
-                class="form-control"
-              >
-            </div>
-          </div>
+          <input class="form-control mb-2"
+                 type="number"
+                 placeholder="Horas Reales"
+                 [(ngModel)]="proyecto.horasReales">
 
-          <button
-            (click)="guardar()"
-            class="btn btn-success w-100 mt-4 fw-bold"
-          >
-            💾 GUARDAR EN MYSQL
+          <input class="form-control mb-2"
+                 type="number"
+                 placeholder="Costo Hora"
+                 [(ngModel)]="proyecto.costoHora">
+
+          <button class="btn btn-success w-100"
+                  (click)="guardar()">
+            GUARDAR
           </button>
 
-          <!-- ✅ NUEVA SECCIÓN: LISTA DE REGISTROS -->
-          <hr class="my-4">
+          <!-- LISTA -->
+          <div *ngFor="let p of proyectos" class="card mt-2">
+            <div class="card-body d-flex justify-content-between">
 
-          <h6 class="fw-bold">📋 Proyectos registrados</h6>
-
-          <div *ngIf="proyectos.length === 0" class="text-muted small">
-            No hay registros aún.
-          </div>
-
-          <div *ngFor="let p of proyectos" class="card mt-2 shadow-sm">
-            <div class="card-body py-2 d-flex justify-content-between align-items-center">
-
-              <div class="small">
+              <div>
                 <strong>{{ p.nombre }}</strong><br>
-                🕒 Est: {{ p.horasEstimadas }} |
-                ⏱️ Real: {{ p.horasReales }} |
-                💰 $/Hora: {{ p.costoHora }} |
-                💵 Total: {{ p.horasReales * p.costoHora }}
+                Total: {{ p.horasReales * p.costoHora }}
               </div>
 
-              <button
-                class="btn btn-outline-danger btn-sm"
-                title="Eliminar registro"
-                (click)="eliminar(p.id!)"
-              >
+              <button class="btn btn-danger"
+                      (click)="eliminar(p._id!)">
                 🗑️
               </button>
 
@@ -131,16 +69,12 @@
       </div>
     </div>
 
-    <!-- GRÁFICAS -->
+    <!-- GRAFICAS -->
     <div class="col-md-7">
-      <div class="card shadow border-0 mb-3" style="height:250px; background-color:white;">
-        <div id="grafica1" style="width:100%; height:100%;"></div>
-      </div>
-
-      <div class="card shadow border-0" style="height:250px; background-color:white;">
-        <div id="grafica2" style="width:100%; height:100%;"></div>
-      </div>
+      <div id="grafica1" style="height:250px;"></div>
+      <div id="grafica2" style="height:250px;"></div>
     </div>
 
   </div>
+
 </div>
