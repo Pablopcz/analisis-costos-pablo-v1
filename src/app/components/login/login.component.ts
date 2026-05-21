@@ -19,49 +19,71 @@ export class LoginComponent {
     password: ''
   };
 
-  // 1. FUNCIÓN PARA EL BOTÓN AZUL (Manual)
+  // ✅ LOGIN MANUAL (AGREGAMOS TU USUARIO FICTICIO)
   async entrar() {
     try {
-      const resultado = await signInWithEmailAndPassword(this.auth, this.credenciales.usuario, this.credenciales.password);
-      
-      // Guardamos los datos para que el formulario los use
+
+      // 🔥 1. USUARIO FICTICIO (PRIMERO)
+      if (
+        this.credenciales.usuario === 'mia@demo.com' &&
+        this.credenciales.password === '12345'
+      ) {
+        const datosUsuario = {
+          displayName: 'Usuario Demo',
+          email: this.credenciales.usuario
+        };
+
+        localStorage.setItem('usuario', JSON.stringify(datosUsuario));
+
+        console.log('✅ Entraste con usuario ficticio');
+        this.router.navigate(['/dashboard']);
+        return;
+      }
+
+      // 🔥 2. LOGIN ORIGINAL (NO LO TOCAMOS)
+      const resultado = await signInWithEmailAndPassword(
+        this.auth,
+        this.credenciales.usuario,
+        this.credenciales.password
+      );
+
       const datosUsuario = {
         displayName: 'Usuario Manual',
         email: resultado.user.email
       };
+
       localStorage.setItem('usuario', JSON.stringify(datosUsuario));
 
-      console.log('✅ Entraste con éxito');
+      console.log('✅ Entraste con Firebase');
       this.router.navigate(['/dashboard']);
+
     } catch (error: any) {
       console.error(error);
-      alert('❌ Error: Usuario o contraseña no válidos');
+      alert('❌ Usuario o contraseña incorrectos');
     }
   }
 
-  // 2. FUNCIÓN PARA EL BOTÓN ROJO (Google) - LA MÁS IMPORTANTE
+  // ✅ GOOGLE (NO SE TOCA)
   async loginConGoogle() {
     try {
       const provider = new GoogleAuthProvider();
       const resultado = await signInWithPopup(this.auth, provider);
-      
-      // EXTRAEMOS LOS DATOS DE GOOGLE
+
       const datosUsuario = {
         displayName: resultado.user.displayName,
         email: resultado.user.email,
         photoURL: resultado.user.photoURL
       };
 
-      // LOS GUARDAMOS EN EL NAVEGADOR
       localStorage.setItem('usuario', JSON.stringify(datosUsuario));
-      
+
       console.log('✅ Entraste con Google:', datosUsuario.displayName);
-      
-      // Saltamos al formulario/dashboard
-      this.router.navigate(['/dashboard']); 
+      this.router.navigate(['/dashboard']);
+
     } catch (error: any) {
       console.error(error);
       alert('❌ Error al conectar con Google');
     }
   }
 }
+``
