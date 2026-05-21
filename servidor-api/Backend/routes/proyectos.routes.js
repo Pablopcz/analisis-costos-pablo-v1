@@ -8,8 +8,10 @@ router.get("/", async (req, res) => {
   try {
     const proyectos = await Proyecto.find();
     res.json(proyectos);
+
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener proyectos" });
+    console.error("🔥 ERROR REAL:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -19,7 +21,8 @@ router.post("/", async (req, res) => {
     const nuevo = await Proyecto.create(req.body);
     res.status(201).json(nuevo);
   } catch (error) {
-    res.status(500).json({ error: "Error al guardar proyecto" });
+    console.error("🔥 ERROR GUARDAR:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -29,9 +32,9 @@ router.delete("/:id", async (req, res) => {
     await Proyecto.findByIdAndDelete(req.params.id);
     res.json({ mensaje: "Proyecto eliminado" });
   } catch (error) {
-    res.status(500).json({ error: "Error al eliminar proyecto" });
+    console.error("🔥 ERROR ELIMINAR:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
 export default router;
-``

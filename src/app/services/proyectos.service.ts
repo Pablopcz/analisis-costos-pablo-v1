@@ -15,7 +15,7 @@ export interface Proyecto {
 })
 export class ProyectosService {
 
-  private apiUrl = 'http://localhost:4000/api/proyectos';
+  private apiUrl = 'https://analisis-costos-pablo-v1-production.up.railway.app/api/proyectos';
 
   constructor(private http: HttpClient) {}
 
