@@ -23,20 +23,20 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Puerto de Railway
+// ✅ Puerto
 const PORT = process.env.PORT || 4000;
 
-// ✅ CONEXIÓN A MONGO (AHORA CONTROLA EL ARRANQUE)
+// ✅ Conexión a Mongo + arranque seguro
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB conectado correctamente");
-
-    // 🔥 SOLO CAMBIO AQUÍ
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Backend escuchando en puerto ${PORT}`);
-    });
-
+    console.log("✅ Mongo conectado correctamente");
   })
   .catch((err) => {
-    console.error("❌ Error conectando a MongoDB:", err);
+    console.error("❌ Error Mongo:", err);
   });
+
+// ✅ ARRANCAR SIEMPRE (IMPORTANTE PARA RAILWAY)
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Backend escuchando en puerto ${PORT}`);
+});
