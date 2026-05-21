@@ -35,7 +35,7 @@ export class LoginComponent {
 
         localStorage.setItem('usuario', JSON.stringify(datosUsuario));
 
-        console.log('✅ Entraste con usuario ficticio');
+        console.log('✅ Entrastes con usuario ficticio');
         this.router.navigate(['/dashboard']);
         return;
       }
