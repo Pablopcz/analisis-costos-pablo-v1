@@ -3,7 +3,7 @@ import Proyecto from "../models/proyecto.model.js";
 
 const router = Router();
 
-// ✅ GET → obtener todos (para tablas + gráficas)
+// ✅ GET → obtener todos
 router.get("/", async (req, res) => {
   try {
     const proyectos = await Proyecto.find();
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ POST → guardar proyecto
+// ✅ POST → guardar
 router.post("/", async (req, res) => {
   try {
     const nuevo = await Proyecto.create(req.body);
@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ DELETE → eliminar proyecto
+// ✅ DELETE → eliminar
 router.delete("/:id", async (req, res) => {
   try {
     await Proyecto.findByIdAndDelete(req.params.id);
@@ -38,3 +38,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+``
