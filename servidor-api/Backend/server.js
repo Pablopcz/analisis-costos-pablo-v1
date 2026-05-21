@@ -25,16 +25,17 @@ app.get("/", (req, res) => {
 // ✅ Puerto de Railway
 const PORT = process.env.PORT || 4000;
 
-// ✅ ARRANCA SIEMPRE EL SERVIDOR
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Backend escuchando en puerto ${PORT}`);
-});
-
-// ✅ CONEXIÓN A MONGO (NO BLOQUEA EL SERVER)
+// ✅ CONEXIÓN A MONGO (AHORA CONTROLA EL ARRANQUE)
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB conectado correctamente");
+
+    // 🔥 SOLO CAMBIO AQUÍ
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Backend escuchando en puerto ${PORT}`);
+    });
+
   })
   .catch((err) => {
     console.error("❌ Error conectando a MongoDB:", err);
